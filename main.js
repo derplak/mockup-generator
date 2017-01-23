@@ -1,7 +1,7 @@
 var app = require('electron').app;
 var Menu = require('electron').Menu;
 var menubar = require('menubar');
-var mb = menubar({width: 370, height: 210, preloadWindow:true, icon: __dirname+'/img/icon/icon.png'});
+var mb = menubar({width: 370, height: 210, preloadWindow:true, icon: __dirname+'/img/icon/iconTemplate.png'});
 
 mb.on('ready', function ready () {
   var template = [{
