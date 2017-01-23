@@ -27,7 +27,7 @@ app.controller('mainCtrl', function ($scope) {
 
     username().then(username => {
 
-      var fileName = $scope.url.replace(/.*?:\/\//g, "");
+      var fileName = cleanUrl();
       var device = $scope.screenSelect;
       var deviceName = device.name;
       var dimensionX = device.dimensionX;
@@ -86,6 +86,11 @@ app.controller('mainCtrl', function ($scope) {
     });
   }
 
+  function cleanUrl(argument) {
+    var fileName = $scope.url.replace(/.*?:\/\//g, "");
+    fileName = fileName.replace(/\/$/,"")
+    return fileName
+  }
 
 });
 
