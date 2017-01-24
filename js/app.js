@@ -9,6 +9,7 @@ app.controller('mainCtrl', function ($scope) {
   $scope.loading = false;
   $scope.useDevices = true;
   $scope.addShadow = false;
+  $scope.fullHeight = false;
   $scope.url = '';
   $scope.devices = [
   {'name': 'Apple Macbook', 'mobile':false, 'x2': true, 'dimensionX':2304, 'dimensionY': 1440, 'x':380, 'y':128, 'size':3064, 'path':'apple-macbook.png'},
@@ -59,7 +60,7 @@ app.controller('mainCtrl', function ($scope) {
         },
         shotSize: {
           width: dimensionX,
-          height: dimensionY
+          height: ($scope.fullHeight == true && $scope.useDevices == false? 'all' : dimensionY)
         },
         customCSS: css,
         userAgent: userAgent,

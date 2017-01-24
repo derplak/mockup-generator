@@ -26,7 +26,7 @@
       <div class="col-xs-12">
         <div class="checkbox">
           <label>
-            <input type="checkbox" ng-model="useDevices" > Add screenshot to device?
+            <input type="checkbox" ng-model="useDevices"> Add screenshot to a device mock-up?
           </label>
         </div>
       </div>
@@ -35,6 +35,14 @@
         <div class="checkbox">
           <label>
             <input type="checkbox" ng-model="useShadow"> Add device shadow?
+          </label>
+        </div>
+      </div>
+
+      <div class="col-xs-12" ng-show="useDevices == false">
+        <div class="checkbox">
+          <label>
+            <input type="checkbox" ng-model="fullHeight"> Full height of the webpage?
           </label>
         </div>
       </div>
