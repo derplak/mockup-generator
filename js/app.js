@@ -5,12 +5,14 @@ app.controller('mainCtrl', function ($scope) {
   var images = require('images');
   var webshot = require('webshot');
   var username = require('username');
+  var ipc = require('electron').ipcRenderer;
 
   $scope.loading = false;
   $scope.useDevices = true;
   $scope.addShadow = false;
   $scope.fullHeight = false;
   $scope.url = '';
+  $scope.outputLocation = '';
   $scope.devices = [
   {'name': 'Apple Macbook', 'mobile':false, 'x2': true, 'dimensionX':2304, 'dimensionY': 1440, 'x':380, 'y':128, 'size':3064, 'path':'apple-macbook.png'},
   {'name': 'Apple Macbook Air 11"', 'mobile':false, 'x2': false, 'dimensionX':1366, 'dimensionY': 768, 'x':299, 'y':103, 'size':1962, 'path':'apple-macbook-air-11.png'},
@@ -22,70 +24,82 @@ app.controller('mainCtrl', function ($scope) {
   {'name': 'Google Pixel', 'mobile':true, 'x2': true, 'dimensionX':1080, 'dimensionY': 1920, 'x':200, 'y':500, 'size':1480, 'path':'google-pixel.png'},
   ];
 
+  $scope.init = function() {
+    username().then(username => {
+      $scope.outputLocation = '/Users/'+username+'/Desktop';
+      $scope.$apply();
+    });
+  }
 
   $scope.downloadScreenshot = function() {
     $scope.loading = true;
 
-    username().then(username => {
+    var fileName = cleanUrl();
+    var outputLocation = $scope.outputLocation;
+    var device = $scope.screenSelect;
+    var deviceName = device.name;
+    var dimensionX = device.dimensionX;
+    var dimensionY = device.dimensionY;
+    var x = device.x;
+    var y = device.y;
+    var size = device.size;
+    var path = device.path;
+    var css = '';
+    var userAgent = '';
+    var shadow = 'no-shadow/';
 
-      var fileName = cleanUrl();
-      var device = $scope.screenSelect;
-      var deviceName = device.name;
-      var dimensionX = device.dimensionX;
-      var dimensionY = device.dimensionY;
-      var x = device.x;
-      var y = device.y;
-      var size = device.size;
-      var path = device.path;
-      var css = '';
-      var userAgent = '';
-      var shadow = 'no-shadow/';
-
-      if (device.mobile == true) {
-        userAgent = 'Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_2 like Mac OS X; en-us)'
-        + ' AppleWebKit/531.21.20 (KHTML, like Gecko) Mobile/7B298g';
-      }
-      if (device.x2) {
-        css = 'body {-webkit-transform: scale(2);  -webkit-transform-origin: 0 0; width:50%;}';
-      }
-      if ($scope.useShadow == true) {
-        shadow = 'shadow/';
-      }
-
-
-      var options = {
-        screenSize: {
-          width: dimensionX,
-          height: dimensionY
-        },
-        shotSize: {
-          width: dimensionX,
-          height: ($scope.fullHeight == true && $scope.useDevices == false? 'all' : dimensionY)
-        },
-        customCSS: css,
-        userAgent: userAgent,
-        defaultWhiteBackground: true,
-        quality: 100,
-        streamType: 'png'
-      }
+    if (device.mobile == true) {
+      userAgent = 'Mozilla/5.0 (iPhone; U; CPU iPhone OS 3_2 like Mac OS X; en-us)'
+      + ' AppleWebKit/531.21.20 (KHTML, like Gecko) Mobile/7B298g';
+    }
+    if (device.x2) {
+      css = 'body {-webkit-transform: scale(2);  -webkit-transform-origin: 0 0; width:50%;}';
+    }
+    if ($scope.useShadow == true) {
+      shadow = 'shadow/';
+    }
 
 
-      if ($scope.useDevices == true) {
-        webshot($scope.url, __dirname+'/img/screenshots/'+deviceName+'.png', options, function(err) {
-          images(__dirname+'/img/devices/'+shadow+path).size(size).draw(images(__dirname+'/img/screenshots/'+deviceName+'.png'), x, y).save('/Users/'+username+'/Desktop/'+fileName+' - '+deviceName+'.png', { quality : 100 });
+    var options = {
+      screenSize: {
+        width: dimensionX,
+        height: dimensionY
+      },
+      shotSize: {
+        width: dimensionX,
+        height: ($scope.fullHeight == true && $scope.useDevices == false? 'all' : dimensionY)
+      },
+      customCSS: css,
+      userAgent: userAgent,
+      defaultWhiteBackground: true,
+      quality: 100,
+      streamType: 'png'
+    }
 
-          $scope.loading = false;
-          $scope.$apply();
-        });
-      } else {
-        webshot($scope.url, '/Users/'+username+'/Desktop/'+fileName+' - '+deviceName+'.png', options, function(err) {
-          $scope.loading = false;
-          $scope.$apply();
-        });
-      }
 
-    });
+    if ($scope.useDevices == true) {
+      webshot($scope.url, __dirname+'/img/screenshots/'+deviceName+'.png', options, function(err) {
+        images(__dirname+'/img/devices/'+shadow+path).size(size).draw(images(__dirname+'/img/screenshots/'+deviceName+'.png'), x, y).save(outputLocation+'/'+fileName+' - '+deviceName+'.png', { quality : 100 });
+
+        $scope.loading = false;
+        $scope.$apply();
+      });
+    } else {
+      webshot($scope.url, outputLocation+'/'+fileName+' - '+deviceName+'.png', options, function(err) {
+        $scope.loading = false;
+        $scope.$apply();
+      });
+    }
   }
+
+  $scope.setOutputLocation = function() {
+    ipc.send('open-file-dialog');
+  }
+
+  ipc.on('selected-directory', function (event, path) {
+    $scope.outputLocation = path[0];
+    $scope.$apply();
+  });
 
   function cleanUrl(argument) {
     var fileName = $scope.url.replace(/.*?:\/\//g, "");

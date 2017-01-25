@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
   </head>
-  <body ng-cloak data-ng-controller="mainCtrl">
+  <body ng-cloak data-ng-controller="mainCtrl" data-ng-init="init()">
 
     <form class="form-horizontal">
       <div class="col-xs-12">
@@ -48,10 +48,24 @@
       </div>
 
       <div class="col-xs-12">
-        <div class="select">
+        <div class="select gap">
           <label for="source" class="control-label">Screen:</label>
           <select class="form-control" ng-init="screenSelect = devices[0]"  ng-model="screenSelect" ng-options="item as item.name for item in devices">
           </select>
+        </div>
+      </div>
+
+      <div class="col-xs-12">
+        <div class="gap">
+          <label for="outputLocation" class="control-label">Output location:</label>
+          <div class="input-group">
+              <input class="form-control" type="text" name="outputLocation" ng-model="outputLocation" readonly>
+              <div class="input-group-btn">
+                <button ng-click="setOutputLocation()" class="btn btn-primary">
+                  <i class='fa fa-folder-open-o'></i>
+                </button>
+              </div>
+          </div>
         </div>
       </div>
     </form>

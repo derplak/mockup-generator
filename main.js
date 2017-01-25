@@ -1,7 +1,9 @@
 var app = require('electron').app;
+var ipc = require('electron').ipcMain;
+var dialog = require('electron').dialog;
 var Menu = require('electron').Menu;
 var menubar = require('menubar');
-var mb = menubar({width: 370, height: 210, preloadWindow:true, icon: __dirname+'/img/icon/iconTemplate.png'});
+var mb = menubar({width: 370, height: 265, preloadWindow:true, icon: __dirname+'/img/icon/iconTemplate.png'});
 
 mb.on('ready', function ready () {
   var template = [{
@@ -22,6 +24,14 @@ mb.on('ready', function ready () {
           { label: "Select All", accelerator: "CmdOrCtrl+A", selector: "selectAll:" }
       ]}
   ];
+
+  ipc.on('open-file-dialog', function (event) {
+    dialog.showOpenDialog({
+      properties: ['openDirectory']
+    }, function (files) {
+      if (files) event.sender.send('selected-directory', files);
+    });
+  });
 
   // mb.window.openDevTools(); //uncomment to view dev tools
 
