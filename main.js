@@ -3,7 +3,7 @@ var ipc = require('electron').ipcMain;
 var dialog = require('electron').dialog;
 var Menu = require('electron').Menu;
 var menubar = require('menubar');
-var mb = menubar({width: 370, height: 265, preloadWindow:true, icon: __dirname+'/img/icon/iconTemplate.png'});
+var mb = menubar({width: 370, height: 305, preloadWindow:true, icon: __dirname+'/img/icon/iconTemplate.png'});
 
 mb.on('ready', function ready () {
   var template = [{

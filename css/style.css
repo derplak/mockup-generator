@@ -14,13 +14,9 @@ body {
     position: relative;
     background-color: #e3e3e5;
     -webkit-user-select: none;
-    padding: 10px 5px;
+    padding: 10px 0;
 }
 
 input:focus, *:focus {
     outline: none;
-}
-
-.gap {
-  margin-top: 5px;
 }
