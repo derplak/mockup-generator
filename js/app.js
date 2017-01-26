@@ -2,17 +2,21 @@ var app = angular.module('mockupGenerator', []);
 
 app.controller('mainCtrl', function ($scope) {
 
+  //import node packages
   var images = require('images');
   var webshot = require('webshot');
   var username = require('username');
   var ipc = require('electron').ipcRenderer;
 
+  //init variables and arrays
   $scope.loading = false;
   $scope.useDevices = true;
   $scope.addShadow = false;
   $scope.fullHeight = false;
   $scope.url = '';
   $scope.outputLocation = '';
+
+  //device information
   $scope.devices = [
   {'name': 'Apple Macbook', 'mobile':false, 'x2': true, 'dimensionX':2304, 'dimensionY': 1440, 'x':380, 'y':128, 'size':3064, 'path':'apple-macbook.png'},
   {'name': 'Apple Macbook Air 11"', 'mobile':false, 'x2': false, 'dimensionX':1366, 'dimensionY': 768, 'x':299, 'y':103, 'size':1962, 'path':'apple-macbook-air-11.png'},
@@ -24,6 +28,7 @@ app.controller('mainCtrl', function ($scope) {
   {'name': 'Google Pixel', 'mobile':true, 'x2': true, 'dimensionX':1080, 'dimensionY': 1920, 'x':200, 'y':500, 'size':1480, 'path':'google-pixel.png'},
   ];
 
+  //on init set the default output location
   $scope.init = function() {
     username().then(username => {
       $scope.outputLocation = '/Users/'+username+'/Desktop';
@@ -31,9 +36,10 @@ app.controller('mainCtrl', function ($scope) {
     });
   }
 
+  //download and save the screenshot
   $scope.downloadScreenshot = function() {
-    $scope.loading = true;
 
+    $scope.loading = true;
     var fileName = cleanUrl();
     var outputLocation = $scope.outputLocation;
     var device = $scope.screenSelect;
@@ -59,7 +65,6 @@ app.controller('mainCtrl', function ($scope) {
       shadow = 'shadow/';
     }
 
-
     var options = {
       screenSize: {
         width: dimensionX,
@@ -77,10 +82,11 @@ app.controller('mainCtrl', function ($scope) {
     }
 
 
+    //save the screenshot
     if ($scope.useDevices == true) {
       webshot($scope.url, __dirname+'/img/screenshots/'+deviceName+'.png', options, function(err) {
+        //combine the images
         images(__dirname+'/img/devices/'+shadow+path).size(size).draw(images(__dirname+'/img/screenshots/'+deviceName+'.png'), x, y).save(outputLocation+'/'+fileName+' - '+deviceName+'.png', { quality : 100 });
-
         $scope.loading = false;
         $scope.$apply();
       });
@@ -101,6 +107,7 @@ app.controller('mainCtrl', function ($scope) {
     $scope.$apply();
   });
 
+  //remove http/https from the start of the file name and remove trailing slash
   function cleanUrl(argument) {
     var fileName = $scope.url.replace(/.*?:\/\//g, "");
     fileName = fileName.replace(/\/$/,"")
